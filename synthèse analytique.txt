@@ -1,0 +1,125 @@
+Exemple de timeline :
+
+Jour 1 : Feature engineering + stacking
+
+Jour 2 : Optimisation hyperparamètres
+
+Jour 3 : Combinaison finale et soumission
+
+
+
+
+
+
+
+
+
+
+
+
+
+Voici une synthèse analytique de tes résultats et les prochaines étapes stratégiques :
+
+### 1. Insights Clés
+**a) Plaques Gouvernementales (1.3% des données) :**
+- Prix moyen 6x supérieur (2.5M vs 0.43M RUB)
+- **Corrélation forte** entre :
+  - `is_gov_plate` ↔ `gov_importance_level` (0.90)
+  - `is_gov_plate` ↔ `has_road_advantage` (0.95)
+
+**b) Chiffres Magiques :**
+- Prix médian 3.2x plus élevé (420k vs 130k RUB)
+- Impact plus fort que le statut gouvernemental seul
+
+**c) Outliers (10.85%) :**
+- Tous non-gouvernementaux mais avec motifs spéciaux :
+  - `777`/`888` dans la plaque
+  - Combinaisons de lettres rares (`KK`, `XX`)
+
+### 2. Recommandations d'Optimisation
+
+#### Feature Engineering Ciblé :
+```python
+# Nouvelle variable composite
+train['premium_plate'] = (
+    (train['is_gov_plate'] == 1) | 
+    (train['digits'].isin([777, 999])) & 
+    (train['letters'].str.contains('AA|KK|XX'))
+).astype(int)
+
+# Encodage avancé des régions
+train['is_capital_region'] = train['region_name'].isin(
+    ['Moscow', 'Saint Petersburg']).astype(int)
+```
+
+#### Gestion des Outliers :
+```python
+# Approche 1 : Capping
+price_cap = train['price'].quantile(0.99)
+train['price'] = np.where(train['price'] > price_cap, price_cap, train['price'])
+
+# Approche 2 : Modèle dédié
+outlier_model = RandomForestRegressor()
+outlier_model.fit(train[train['price'] < price_cap][features], ...)
+```
+
+#### Modélisation Stratifiée :
+```python
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import make_pipeline
+
+# Pipeline pour plaques normales
+normal_pipe = make_pipeline(
+    StandardScaler(),
+    GradientBoostingRegressor()
+)
+
+# Pipeline pour plaques premium
+premium_pipe = make_pipeline(
+    RobustScaler(),  # Moins sensible aux outliers
+    XGBRegressor()
+)
+
+# Combinaison intelligente
+if X['premium_plate'] == 1:
+    return premium_pipe.predict(X)
+else:
+    return normal_pipe.predict(X)
+```
+
+### 3. Visualisations Stratégiques
+```python
+# Relation Prix vs. Caractéristiques Premium
+sns.lmplot(
+    x='gov_importance_level',
+    y='price',
+    hue='is_magic',
+    data=train,
+    scatter_kws={'alpha':0.3},
+    height=6,
+    aspect=1.5
+)
+plt.title('Interaction Chiffres Magiques & Importance Gouvernementale')
+plt.show()
+```
+
+### 4. Plan d'Action
+1. **Feature Engineering** :
+   - [x] Créer `premium_plate`
+   - [ ] Calculer la rareté des combinaisons de lettres
+   - [ ] Extraire les années des plaques (si possible)
+
+2. **Prétraitement** :
+   - [ ] Appliquer un log-transform sur `price`
+   - [ ] Standardiser les régions peu fréquentes
+
+3. **Modélisation** :
+   - [ ] Essayer un modèle à deux branches
+   - [ ] Optimiser avec Optuna pour minimiser SMAPE
+
+**Question clé** : Veux-tu que nous :
+1. Approfondissions l'analyse des outliers ?
+2. Commencions directement la modélisation ?
+3. Explorions des interactions spécifiques (ex: `777` + région capitale) ?
+
+Je peux adapter la suite en fonction de ta priorité actuelle.

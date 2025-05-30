@@ -1,0 +1,15 @@
+Modèle LightGBM - Soumission Kaggle
+Date: 20250525_1320
+SMAPE CV: 5.5513 (±0.0768)
+Features utilisées: ['digits', 'region_encoded', 'is_gov_plate', 'premium_plate', 'plate_age_days', 'premium_region']
+Hyperparamètres: {'n_estimators': 850, 'learning_rate': 0.05, 'num_leaves': 31, 'force_row_wise': True, 'random_state': 42, 'verbosity': -1, 'metric': 'mape'}
+Statistiques prédictions:
+count    7.695000e+03
+mean     2.459688e+05
+std      2.703915e+05
+min      5.065515e+04
+25%      9.050382e+04
+50%      1.445976e+05
+75%      2.759893e+05
+max      1.689723e+06
+Name: Price, dtype: float64

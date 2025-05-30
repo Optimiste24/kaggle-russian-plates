@@ -1,0 +1,13 @@
+Modèle StackingRegressor - Soumission Kaggle
+Date: 20250526_1213
+Features utilisées: ['prestige_score', 'region_encoded', 'is_ultra_premium', 'plate_age_days']
+Statistiques des prédictions :
+count    7.695000e+03
+mean     1.919393e+05
+std      1.739797e+05
+min      7.360000e+04
+25%      1.214360e+05
+50%      1.484900e+05
+75%      1.852470e+05
+max      2.377512e+06
+Name: Price, dtype: float64
